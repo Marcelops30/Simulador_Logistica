@@ -121,28 +121,109 @@ class Usuario {
 
 
 // Classe Atividades do simulador
-// Autor:
+// Autor: Marcelo
 class Atividade {
-	private $id_asm;
-	private $nome_asm;
-	private $tempo_asm;
-	private $pontuacao_asm;
-	private $imagem_asm;
-
-	function __construct($nome_asm, $tempo_asm, $pontuacao_asm, $imagem_asm) {
-		$this->nome_asm = $nome_asm;
-		$this->tempo_asm = $tempo_asm;
-		$this->pontuacao_asm = $pontuacao_asm;
-		$this->imagem_asm = $imagem_asm;
+    protected $tabela = 'tbl_atividade';
+    private $nome;
+    private $tempo;
+    private $pontuacao;
+    private $imagem;
+        
+    function __construct( $nome, $tempo, $pontuacao, $imagem) {
+        $this->nome = $nome;
+        $this->tempo = $tempo;
+        $this->pontuacao = $pontuacao;
+        $this->imagem = $imagem;
+    }
+    
+    public function __set($atrib, $value) {
+        $this->$atrib = $value;
+    }
+    
+    public function __get($atrib) {
+        return $this->$atrib ;
+    }
+    
+    public function adicionar(){
+        $sql = "INSERT INTO $this->table (nome_asm, tempo_asm, pontuacao_asm, imagem_asm)"
+                . "VALUES (:nome, :tempo, :pontuacao, :imagem)";
+        
+        $stmt = DB::prepare ($sql);
+        $stmt->bindParam (':nome', $this->nome);
+        $stmt->bindParam (':tempo', $this->tempo);
+        $stmt->bindParam (':pontuacao', $this->pontuacao);
+        $stmt->bindParam (':imagem', $this->imagem);
+        return $stmt->execute();
+    }
+    
+    public function atualizar($id) {
+        $sql = "UPDATE $this->table SET nome_asm = :nome,
+                                         tempo_asm = :tempo,
+                                         pontuacao_asm = :pontuacao,
+                                         imagem_asm = :imagem
+                                         WHERE $this->id =:id";
+        $stmt = DB::prepare ($sql);
+        $stmt->bindParam (':nome', $this->nome);
+        $stmt->bindParam (':tempo', $this->tempo);
+        $stmt->bindParam (':pontuacao', $this->pontuacao);
+        $stmt->bindParam (':imagem', $this->imagem);
+        $stmt->bindParam (':id', $id);
+        return $stmt->execute();
+    }
+    
+   public function procurar($id){ // Procurar
+		$sql = "SELECT * FROM $this->table WHERE $this->id = :id";
+		$stmt = DB::prepare ( $sql );
+		$stmt->bindParam ( ':id', $id, PDO::PARAM_INT );
+		$stmt->execute ();
+		return $stmt->fetch ();
 	}
+	public function listarTodos(){ //listar
+		$sql = "SELECT * FROM $this->table";
+		$stmt = DB::prepare ( $sql );
+		$stmt->execute ();
+		return $stmt->fetchAll ();
+	}
+	public function deletar($id) {
+		$sql = "DELETE FROM $this->table WHERE $this->id = :id";
+		$stmt = DB::prepare ( $sql );
+		$stmt->bindParam ( ':id', $id, PDO::PARAM_INT );
+		return $stmt->execute ();
+	}
+}
+
+
+
+// classe Componente curricular
+// Autor:
+class ComponenteCurricular {
+	private $id_ccr;
+	private $nome_ccr;
+	private $cargaHoraria_ccr;
+
+	/*public function __construct() {
+		$this->id_ccr = 0;
+		$this->nome_ccr = "";
+		$this->cargaHoraria_ccr = 0;
+	}*/
+
+	public function __construct($id_ccr, $nome_ccr, $cargaHoraria_ccr) {
+		$this->id_cur = $id_cur;
+		$this->nome_cur = $nome_cur;
+		$this->cargaHoraria_ccr = $cargaHoraria_ccr;
+	}
+
+	/*public function __construct($id_ccr) {
+		$this->id_ccr = $id_ccr;
+	}*/
 
 	public function __set($atrib, $value) {
 		$this->$atrib = $value;
 	}
+
 	public function __get($atrib) {
 		return $this->$atrib;
 	}
-
 }
 
 
@@ -227,35 +308,67 @@ class Curso {
 
 
 // Classe Item
-// Autor:
+// Autor: Marcelo
 class Item {
-	private $Atividade;
+        protected $tabela = 'tbl_item_atividade';
 	private $nome_ias;
 	private $seguencia_ias;
-	function __construct($Atividade, $nome_ias, $seguencia_ias) {
-		$this->Atividade = $Atividade;
-		$this->nome_ias = $nome_ias;
-		$this->seguencia_ias = $seguencia_ias;
+        
+	function __construct($nome, $seguencia) {
+		$this->nome = $nome;
+		$this->seguencia = $seguencia;
 	}
-	function getAtividade() {
-		return $this->Atividade;
+        
+	public function __set($atrib, $value){
+			$this->atrib = $value;
 	}
-	function getNome_ias() {
-		return $this->nome_ias;
+	
+	public function __get($atrib){
+			return $this->atrib;
 	}
-	function getSeguencia_ias() {
-		return $this->seguencia_ias;
+	
+        public function adicionar(){
+        $sql = "INSERT INTO $this->table (nome_ias, seguencia_ias)"
+                . "VALUES (:nome, :seguencia)";
+        
+        $stmt = DB::prepare ($sql);
+        $stmt->bindParam (':nome', $this->nome);
+        $stmt->bindParam (':seguencia', $this->seguencia);
+        return $stmt->execute();
+    }
+    
+    public function atualizar($id){
+        $sql = "UPDATE $this->table SET nome_ias = :nome,
+                                         seguencia_ias = :seguencia
+                                         WHERE $this->id =:id";
+        $stmt = DB::prepare ($sql);
+        $stmt->bindParam (':nome', $this->nome);
+        $stmt->bindParam (':seguencia', $this->seguencia);
+        $stmt->bindParam (':id', $id);
+        return $stmt->execute();
+    }
+    
+   public function procurar($id){ // Procurar
+		$sql = "SELECT * FROM $this->table WHERE $this->id = :id";
+		$stmt = DB::prepare ( $sql );
+		$stmt->bindParam ( ':id', $id, PDO::PARAM_INT );
+		$stmt->execute ();
+		return $stmt->fetch ();
 	}
-	function setAtividade($Atividade) {
-		$this->Atividade = $Atividade;
+	public function listarTodos(){ // Listar
+		$sql = "SELECT * FROM $this->table";
+		$stmt = DB::prepare ( $sql );
+		$stmt->execute ();
+		return $stmt->fetchAll ();
 	}
-	function setNome_ias($nome_ias) {
-		$this->nome_ias = $nome_ias;
-	}
-	function setSeguencia_ias($seguencia_ias) {
-		$this->seguencia_ias = $seguencia_ias;
+	public function deletar($id) {
+		$sql = "DELETE FROM $this->table WHERE $this->id = :id";
+		$stmt = DB::prepare ( $sql );
+		$stmt->bindParam ( ':id', $id, PDO::PARAM_INT );
+		return $stmt->execute ();
 	}
 }
+
 
 
 // Classe Perfil
