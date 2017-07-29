@@ -276,8 +276,8 @@ class Curso {
 // Autor: Marcelo
 class Item {
         protected $tabela = 'tbl_item_atividade';
-	private $nome_ias;
-	private $seguencia_ias;
+	private $nome;
+	private $seguencia;
         
 	function __construct($nome, $seguencia) {
 		$this->nome = $nome;
